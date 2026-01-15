@@ -27,35 +27,16 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Inventory Management System - Login" />
+        <Head title="Login" />
 
-        <!-- SYSTEM TITLE -->
-        <div class="text-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">
-                Inventory Management System
-            </h1>
-            <p class="text-gray-600 mt-2">
-                Please sign in to manage inventory records
-            </p>
-        </div>
-
-        <!-- STATUS MESSAGE -->
-        <div
-            v-if="status"
-            class="mb-4 font-medium text-sm text-green-600 text-center"
-        >
+        <div v-if="status" class="mb-4 text-sm text-green-600 text-center">
             {{ status }}
         </div>
 
-        <!-- LOGIN FORM -->
-        <form
-            @submit.prevent="submit"
-            class="bg-white shadow rounded-lg p-6"
-        >
+        <form @submit.prevent="submit">
             <!-- EMAIL -->
             <div>
                 <InputLabel for="email" value="Email Address" />
-
                 <TextInput
                     id="email"
                     type="email"
@@ -64,14 +45,12 @@ const submit = () => {
                     required
                     autofocus
                 />
-
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <!-- PASSWORD -->
             <div class="mt-4">
                 <InputLabel for="password" value="Password" />
-
                 <TextInput
                     id="password"
                     type="password"
@@ -79,11 +58,10 @@ const submit = () => {
                     v-model="form.password"
                     required
                 />
-
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <!-- REMEMBER ME -->
+            <!-- OPTIONS -->
             <div class="flex items-center justify-between mt-4">
                 <label class="flex items-center">
                     <Checkbox

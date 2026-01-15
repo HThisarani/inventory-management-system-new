@@ -1,19 +1,20 @@
 <script setup>
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-        <div>
-            <Link href="/">
-                <ApplicationLogo class="w-20 h-20 fill-current text-gray-500" />
-            </Link>
+    <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+        <!-- APP TITLE (instead of Laravel logo) -->
+        <div class="mb-6 text-center">
+            <h1 class="text-2xl font-bold text-gray-800">
+                Inventory Management System
+            </h1>
+            <p class="text-sm text-gray-500">
+                Inventory control and tracking
+            </p>
         </div>
 
-        <div
-            class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg"
-        >
+        <!-- AUTH CARD -->
+        <div class="w-full sm:max-w-md px-6 py-6 bg-white shadow-md rounded-lg">
             <slot />
         </div>
     </div>
