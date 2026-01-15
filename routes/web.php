@@ -46,7 +46,9 @@ Route::middleware('auth')->group(function () {
         ->name('inventory.index');
 
     Route::get('/inventory/add', function () {
-        return Inertia::render('Inventory/Add');
+        return Inertia::render('Inventory/Add', [
+            'existingItems' => \App\Models\Item::select('name')->distinct()->get(),
+        ]);
     })->name('inventory.add');
 
     Route::post('/inventory/add', [InventoryController::class, 'store'])
