@@ -1,0 +1,119 @@
+<script setup>
+import Checkbox from '@/Components/Checkbox.vue'
+import GuestLayout from '@/Layouts/GuestLayout.vue'
+import InputError from '@/Components/InputError.vue'
+import InputLabel from '@/Components/InputLabel.vue'
+import PrimaryButton from '@/Components/PrimaryButton.vue'
+import TextInput from '@/Components/TextInput.vue'
+import { Head, Link, useForm } from '@inertiajs/vue3'
+
+defineProps({
+    canResetPassword: Boolean,
+    status: String,
+})
+
+const form = useForm({
+    email: '',
+    password: '',
+    remember: false,
+})
+
+const submit = () => {
+    form.post(route('login'), {
+        onFinish: () => form.reset('password'),
+    })
+}
+</script>
+
+<template>
+    <GuestLayout>
+        <Head title="Inventory Management System - Login" />
+
+        <!-- SYSTEM TITLE -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">
+                Inventory Management System
+            </h1>
+            <p class="text-gray-600 mt-2">
+                Please sign in to manage inventory records
+            </p>
+        </div>
+
+        <!-- STATUS MESSAGE -->
+        <div
+            v-if="status"
+            class="mb-4 font-medium text-sm text-green-600 text-center"
+        >
+            {{ status }}
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form
+            @submit.prevent="submit"
+            class="bg-white shadow rounded-lg p-6"
+        >
+            <!-- EMAIL -->
+            <div>
+                <InputLabel for="email" value="Email Address" />
+
+                <TextInput
+                    id="email"
+                    type="email"
+                    class="mt-1 block w-full"
+                    v-model="form.email"
+                    required
+                    autofocus
+                />
+
+                <InputError class="mt-2" :message="form.errors.email" />
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="mt-4">
+                <InputLabel for="password" value="Password" />
+
+                <TextInput
+                    id="password"
+                    type="password"
+                    class="mt-1 block w-full"
+                    v-model="form.password"
+                    required
+                />
+
+                <InputError class="mt-2" :message="form.errors.password" />
+            </div>
+
+            <!-- REMEMBER ME -->
+            <div class="flex items-center justify-between mt-4">
+                <label class="flex items-center">
+                    <Checkbox
+                        name="remember"
+                        v-model:checked="form.remember"
+                    />
+                    <span class="ml-2 text-sm text-gray-600">
+                        Remember me
+                    </span>
+                </label>
+
+                <Link
+                    v-if="canResetPassword"
+                    :href="route('password.request')"
+                    class="text-sm text-blue-600 hover:underline"
+                >
+                    Forgot password?
+                </Link>
+            </div>
+
+            <!-- BUTTON -->
+            <div class="mt-6">
+                <PrimaryButton
+                    class="w-full justify-center"
+                    :class="{ 'opacity-25': form.processing }"
+                    :disabled="form.processing"
+                >
+                    Sign In
+                </PrimaryButton>
+            </div>
+        </form>
+    </GuestLayout>
+</template>

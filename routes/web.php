@@ -1,0 +1,72 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\InventoryController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+/*
+|--------------------------------------------------------------------------
+| Redirect Root to Login
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard
+|--------------------------------------------------------------------------
+*/
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    /*
+    | Profile
+    */
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    /*
+    | Inventory Pages
+    */
+    Route::get('/inventory', [InventoryController::class, 'index'])
+        ->name('inventory.index');
+
+    Route::get('/inventory/add', function () {
+        return Inertia::render('Inventory/Add');
+    })->name('inventory.add');
+
+    Route::post('/inventory/add', [InventoryController::class, 'store'])
+        ->name('inventory.store');
+
+    Route::get('/inventory/deduct', function () {
+        return Inertia::render('Inventory/Deduct', [
+            'items' => \App\Models\Item::all(),
+        ]);
+    })->name('inventory.deduct.page');
+
+    Route::post('/inventory/deduct', [InventoryController::class, 'deduct'])
+        ->name('inventory.deduct');
+
+    Route::get('/inventory/{item}/history', [InventoryController::class, 'history'])
+        ->name('inventory.history');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes (Laravel Breeze)
+|--------------------------------------------------------------------------
+*/
+require __DIR__ . '/auth.php';
