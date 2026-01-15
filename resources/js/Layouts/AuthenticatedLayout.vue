@@ -29,6 +29,15 @@ const isActive = (path) => {
 
                     <div class="hidden md:flex items-center space-x-2">
                         <NavLink 
+                            href="/dashboard" 
+                            :class="isActive('/dashboard')
+                                ? 'px-4 py-2 rounded-lg text-blue-700 bg-white font-semibold shadow-md flex items-center justify-center' 
+                                : 'px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-200 font-medium flex items-center justify-center'"
+                        >
+                            Dashboard
+                        </NavLink>
+
+                        <NavLink 
                             href="/inventory" 
                             :class="isActive('/inventory') && !isActive('/inventory/add') && !isActive('/inventory/deduct')
                                 ? 'px-4 py-2 rounded-lg text-blue-700 bg-white font-semibold shadow-md flex items-center justify-center' 
@@ -102,6 +111,15 @@ const isActive = (path) => {
             <!-- MOBILE MENU -->
             <div v-if="showingNavigationDropdown" class="md:hidden border-t border-white/20 bg-blue-700">
                 <div class="px-4 py-3 space-y-1">
+                    <ResponsiveNavLink 
+                        href="/dashboard" 
+                        :class="isActive('/dashboard')
+                            ? 'block px-4 py-3 rounded-lg text-blue-700 bg-white font-semibold flex items-center justify-center' 
+                            : 'block px-4 py-3 rounded-lg text-white hover:bg-white/20 flex items-center justify-center'"
+                    >
+                        Dashboard
+                    </ResponsiveNavLink>
+
                     <ResponsiveNavLink 
                         href="/inventory" 
                         :class="isActive('/inventory') && !isActive('/inventory/add') && !isActive('/inventory/deduct')
