@@ -157,14 +157,5 @@ This project was developed for **academic purposes only**.
 
 ---
 
-## ✅ FINAL GIT COMMANDS (RUN ONCE)
-
-```bash
-git add README.md
-git commit -m "Update README with features, security, and UI details"
-git push origin main
-````
-
----
 
 
