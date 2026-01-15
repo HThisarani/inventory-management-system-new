@@ -66,6 +66,19 @@ class InventoryController extends Controller
     }
 
     /**
+     * Show deduct form page
+     */
+    public function showDeductForm(Request $request)
+    {
+        $items = Item::all();
+
+        return Inertia::render('Inventory/Deduct', [
+            'items' => $items,
+            'selectedItemId' => $request->query('item'), // Pass the pre-selected item ID
+        ]);
+    }
+
+    /**
      * Deduct items from inventory (one or many)
      */
     public function deduct(Request $request)
