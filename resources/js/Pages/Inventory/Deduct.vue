@@ -1,10 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { router, Head, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 
 const props = defineProps({
     items: Array,
+    selectedItemId: [String, Number], // Add this prop to receive the pre-selected item
 })
 
 const page = usePage()
@@ -14,6 +15,13 @@ const errorMessage = computed(() => page.props.flash?.error || page.props.error)
 const rows = ref([
     { id: '', quantity: '' }
 ])
+
+// Pre-select the item if selectedItemId is provided
+onMounted(() => {
+    if (props.selectedItemId) {
+        rows.value[0].id = props.selectedItemId.toString()
+    }
+})
 
 function addRow() {
     rows.value.push({ id: '', quantity: '' })
@@ -91,7 +99,6 @@ function submit() {
                                         :value="item.id"
                                     >
                                         {{ item.name }} ({{ item.quantity }} {{ item.unit }})
-
                                     </option>
                                 </select>
                             </td>
