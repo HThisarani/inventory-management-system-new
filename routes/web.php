@@ -54,11 +54,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/inventory/add', [InventoryController::class, 'store'])
         ->name('inventory.store');
 
-    Route::get('/inventory/deduct', function () {
-        return Inertia::render('Inventory/Deduct', [
-            'items' => \App\Models\Item::all(),
-        ]);
-    })->name('inventory.deduct.page');
+    Route::get('/inventory/deduct', [InventoryController::class, 'showDeductForm'])
+        ->name('inventory.deduct.page');
 
     Route::post('/inventory/deduct', [InventoryController::class, 'deduct'])
         ->name('inventory.deduct');
