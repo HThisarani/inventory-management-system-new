@@ -158,19 +158,19 @@ This project was developed for **academic purposes only**.
 ## 🖼️ Screenshots
 
 ### Login Page
-![Login Page](screenshots/login.jpg)
+![Login Page](Screenshots/login.jpg)
 
 ### Dashboard
-![Dashboard](screenshots/dashboard.jpg)
+![Dashboard](Screenshots/dashboard.jpg)
 
 ### Inventory List
-![Inventory List](screenshots/inventory.jpg)
+![Inventory List](Screenshots/inventory.jpg)
 
 ### Add Items
-![Add Items](screenshots/add-items.jpg)
+![Add Items](Screenshots/add-items.jpg)
 
 ### Deduct Items
-![Deduct Items](screenshots/deduct-items.jpg)
+![Deduct Items](Screenshots/deduct-items.jpg)
 
 ### Item History
-![Item History](screenshots/history.png)
+![Item History](Screenshots/history.jpg)
