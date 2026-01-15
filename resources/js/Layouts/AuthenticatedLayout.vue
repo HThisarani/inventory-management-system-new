@@ -1,12 +1,18 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Dropdown from '@/Components/Dropdown.vue'
 import DropdownLink from '@/Components/DropdownLink.vue'
 import NavLink from '@/Components/NavLink.vue'
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue'
-import { Link } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
 
 const showingNavigationDropdown = ref(false)
+const page = usePage()
+
+// Helper function to check if route is active
+const isActive = (path) => {
+    return page.url.startsWith(path)
+}
 </script>
 
 <template>
@@ -22,15 +28,30 @@ const showingNavigationDropdown = ref(false)
                     </span>
 
                     <div class="hidden md:flex items-center space-x-2">
-                        <NavLink href="/inventory" class="px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-200 font-medium">
+                        <NavLink 
+                            href="/inventory" 
+                            :class="isActive('/inventory') && !isActive('/inventory/add') && !isActive('/inventory/deduct')
+                                ? 'px-4 py-2 rounded-lg text-blue-700 bg-white font-semibold shadow-md flex items-center justify-center' 
+                                : 'px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-200 font-medium flex items-center justify-center'"
+                        >
                             Inventory
                         </NavLink>
 
-                        <NavLink href="/inventory/add" class="px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-200 font-medium">
+                        <NavLink 
+                            href="/inventory/add" 
+                            :class="isActive('/inventory/add')
+                                ? 'px-4 py-2 rounded-lg text-blue-700 bg-white font-semibold shadow-md flex items-center justify-center' 
+                                : 'px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-200 font-medium flex items-center justify-center'"
+                        >
                             Add Items
                         </NavLink>
 
-                        <NavLink href="/inventory/deduct" class="px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-200 font-medium">
+                        <NavLink 
+                            href="/inventory/deduct" 
+                            :class="isActive('/inventory/deduct')
+                                ? 'px-4 py-2 rounded-lg text-blue-700 bg-white font-semibold shadow-md flex items-center justify-center' 
+                                : 'px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-all duration-200 font-medium flex items-center justify-center'"
+                        >
                             Deduct Items
                         </NavLink>
                     </div>
@@ -81,15 +102,30 @@ const showingNavigationDropdown = ref(false)
             <!-- MOBILE MENU -->
             <div v-if="showingNavigationDropdown" class="md:hidden border-t border-white/20 bg-blue-700">
                 <div class="px-4 py-3 space-y-1">
-                    <ResponsiveNavLink href="/inventory" class="block px-4 py-3 rounded-lg text-white hover:bg-white/20">
+                    <ResponsiveNavLink 
+                        href="/inventory" 
+                        :class="isActive('/inventory') && !isActive('/inventory/add') && !isActive('/inventory/deduct')
+                            ? 'block px-4 py-3 rounded-lg text-blue-700 bg-white font-semibold flex items-center justify-center' 
+                            : 'block px-4 py-3 rounded-lg text-white hover:bg-white/20 flex items-center justify-center'"
+                    >
                         Inventory
                     </ResponsiveNavLink>
 
-                    <ResponsiveNavLink href="/inventory/add" class="block px-4 py-3 rounded-lg text-white hover:bg-white/20">
+                    <ResponsiveNavLink 
+                        href="/inventory/add" 
+                        :class="isActive('/inventory/add')
+                            ? 'block px-4 py-3 rounded-lg text-blue-700 bg-white font-semibold flex items-center justify-center' 
+                            : 'block px-4 py-3 rounded-lg text-white hover:bg-white/20 flex items-center justify-center'"
+                    >
                         Add Items
                     </ResponsiveNavLink>
 
-                    <ResponsiveNavLink href="/inventory/deduct" class="block px-4 py-3 rounded-lg text-white hover:bg-white/20">
+                    <ResponsiveNavLink 
+                        href="/inventory/deduct" 
+                        :class="isActive('/inventory/deduct')
+                            ? 'block px-4 py-3 rounded-lg text-blue-700 bg-white font-semibold flex items-center justify-center' 
+                            : 'block px-4 py-3 rounded-lg text-white hover:bg-white/20 flex items-center justify-center'"
+                    >
                         Deduct Items
                     </ResponsiveNavLink>
                 </div>
