@@ -77,7 +77,7 @@ The system allows an authenticated user to manage inventory items by adding stoc
 
 1. Clone the repository
 ```bash
-git clone https://github.com/HThisarani/inventory-management-system.git
+git clone https://github.com/HThisarani/inventory-management-system-new.git
 ````
 
 2. Navigate to the project directory
