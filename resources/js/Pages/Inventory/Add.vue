@@ -216,10 +216,13 @@ function submit() {
                                 :class="{ 'border-red-500': getError(index, 'unit') }"
                             >
                                 <option value="">Select unit</option>
-                                <option>Kg</option>
-                                <option>m</option>
-                                <option>cm</option>
-                                <option>Units</option>
+                               <option>Kg</option>
+                               <option>g</option>
+                               <option>cm</option>
+                               <option>m</option>
+                               <option>L</option>
+                               <option>ml</option>
+                               <option>Units</option>
                             </select>
                             <p v-if="getError(index, 'unit')" class="text-red-600 text-xs mt-1">
                                 {{ getError(index, 'unit') }}
