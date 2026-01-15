@@ -90,7 +90,8 @@ function submit() {
                                         :key="item.id"
                                         :value="item.id"
                                     >
-                                        {{ item.name }} ({{ item.quantity }})
+                                        {{ item.name }} ({{ item.quantity }} {{ item.unit }})
+
                                     </option>
                                 </select>
                             </td>
