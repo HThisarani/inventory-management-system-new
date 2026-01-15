@@ -153,3 +153,24 @@ http://127.0.0.1:8000
 
 This project was developed for **academic purposes only**.
 
+---
+
+## 🖼️ Screenshots
+
+### Login Page
+![Login Page](screenshots/login.jpg)
+
+### Dashboard
+![Dashboard](screenshots/dashboard.jpg)
+
+### Inventory List
+![Inventory List](screenshots/inventory.jpg)
+
+### Add Items
+![Add Items](screenshots/add-items.jpg)
+
+### Deduct Items
+![Deduct Items](screenshots/deduct-items.jpg)
+
+### Item History
+![Item History](screenshots/history.png)
