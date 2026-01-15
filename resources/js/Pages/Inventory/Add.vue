@@ -1,11 +1,20 @@
 <script setup>
 import { ref } from 'vue'
-import { router, Head } from '@inertiajs/vue3'
+import { router, Head, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+
+const page = usePage()
+
+const props = defineProps({
+    existingItems: Array,
+})
 
 const items = ref([
     { name: '', unit: '', quantity: '' }
 ])
+
+const showSuccess = ref(false)
+const errors = ref([])
 
 function addRow() {
     items.value.push({ name: '', unit: '', quantity: '' })
@@ -13,70 +22,137 @@ function addRow() {
 
 function removeRow(index) {
     items.value.splice(index, 1)
+    errors.value = errors.value.filter(err => err.index !== index)
+}
+
+function validateForm() {
+    errors.value = []
+    let isValid = true
+
+    items.value.forEach((item, index) => {
+        const itemErrors = { index, name: '', unit: '', quantity: '' }
+
+        if (!item.name || item.name.trim() === '') {
+            itemErrors.name = 'Item name is required'
+            isValid = false
+        }
+
+        if (!item.unit) {
+            itemErrors.unit = 'Unit is required'
+            isValid = false
+        }
+
+        if (!item.quantity || parseFloat(item.quantity) <= 0) {
+            itemErrors.quantity = 'Quantity must be greater than 0'
+            isValid = false
+        }
+
+        if (itemErrors.name || itemErrors.unit || itemErrors.quantity) {
+            errors.value.push(itemErrors)
+        }
+    })
+
+    return isValid
+}
+
+function getError(index, field) {
+    const error = errors.value.find(err => err.index === index)
+    return error ? error[field] : ''
 }
 
 function submit() {
-    router.post('/inventory/add', { items: items.value })
+    if (!validateForm()) return
+
+    router.post('/inventory/add', { items: items.value }, {
+        onSuccess: () => {
+            showSuccess.value = true
+            items.value = [{ name: '', unit: '', quantity: '' }]
+            errors.value = []
+            setTimeout(() => showSuccess.value = false, 4000)
+        }
+    })
 }
 </script>
 
 <template>
     <Head title="Add Items" />
 
+    <!-- 🔹 ITEM NAME SUGGESTIONS -->
+    <datalist id="item-names">
+        <option
+            v-for="item in existingItems"
+            :key="item.name"
+            :value="item.name"
+        />
+    </datalist>
+
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl md:text-2xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl md:text-2xl text-gray-800">
                 Add Inventory Items
             </h2>
         </template>
 
         <div class="p-4 md:p-6">
-            <!-- Desktop Table View -->
-            <div class="hidden md:block overflow-hidden rounded-lg border border-gray-200 shadow-sm mb-6">
+
+            <!-- SUCCESS MESSAGE -->
+            <div
+                v-if="showSuccess || page.props.flash?.success"
+                class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg"
+            >
+                Items added successfully
+            </div>
+
+            <!-- DESKTOP TABLE -->
+            <div class="hidden md:block border rounded-lg shadow mb-6">
                 <table class="w-full">
-                    <thead>
-                        <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">Name</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">Unit</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">Quantity</th>
-                            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 border-b border-gray-200">Action</th>
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-3 text-left">Name</th>
+                            <th class="p-3 text-left">Unit</th>
+                            <th class="p-3 text-left">Quantity</th>
+                            <th class="p-3 text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="(item, index) in items" :key="index" class="hover:bg-gray-50 transition-colors duration-150">
-                            <td class="px-6 py-4">
-                                <input 
-                                    v-model="item.name" 
+
+                    <tbody>
+                        <tr v-for="(item, index) in items" :key="index">
+                            <td class="p-3">
+                                <input
+                                    v-model="item.name"
+                                    list="item-names"
                                     placeholder="Enter item name"
-                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    class="w-full border rounded px-3 py-2"
                                 />
+                                <p class="text-red-500 text-xs">{{ getError(index,'name') }}</p>
                             </td>
-                            <td class="px-6 py-4">
-                                <select 
-                                    v-model="item.unit" 
-                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
-                                >
-                                    <option value="">Select unit</option>
+
+                            <td class="p-3">
+                                <select v-model="item.unit" class="w-full border rounded px-3 py-2">
+                                    <option value="">Select</option>
                                     <option>Kg</option>
                                     <option>m</option>
                                     <option>cm</option>
                                     <option>Units</option>
                                 </select>
+                                <p class="text-red-500 text-xs">{{ getError(index,'unit') }}</p>
                             </td>
-                            <td class="px-6 py-4">
+
+                            <td class="p-3">
                                 <input
                                     type="number"
                                     step="0.01"
                                     v-model="item.quantity"
-                                    placeholder="0.00"
-                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    class="w-full border rounded px-3 py-2"
                                 />
+                                <p class="text-red-500 text-xs">{{ getError(index,'quantity') }}</p>
                             </td>
-                            <td class="px-6 py-4 text-center">
+
+                            <td class="p-3 text-center">
                                 <button
                                     v-if="items.length > 1"
                                     @click="removeRow(index)"
-                                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm"
+                                    class="text-red-600"
                                 >
                                     Remove
                                 </button>
@@ -86,80 +162,17 @@ function submit() {
                 </table>
             </div>
 
-            <!-- Mobile Card View -->
-            <div class="md:hidden space-y-4 mb-6">
-                <div 
-                    v-for="(item, index) in items" 
-                    :key="index" 
-                    class="bg-white rounded-lg border border-gray-200 shadow-sm p-4"
-                >
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-sm font-semibold text-gray-700">Item #{{ index + 1 }}</span>
-                        <button
-                            v-if="items.length > 1"
-                            @click="removeRow(index)"
-                            class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-all duration-200"
-                        >
-                            Remove
-                        </button>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Name</label>
-                            <input 
-                                v-model="item.name" 
-                                placeholder="Enter item name"
-                                class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
-                            />
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Unit</label>
-                                <select 
-                                    v-model="item.unit" 
-                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-sm"
-                                >
-                                    <option value="">Select</option>
-                                    <option>Kg</option>
-                                    <option>m</option>
-                                    <option>cm</option>
-                                    <option>Units</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    v-model="item.quantity"
-                                    placeholder="0.00"
-                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <button 
-                    @click="addRow" 
-                    class="px-5 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all duration-200 text-sm sm:text-base"
-                >
+            <!-- ACTION BUTTONS -->
+            <div class="flex gap-3">
+                <button @click="addRow" class="px-4 py-2 bg-gray-200 rounded">
                     + Add Row
                 </button>
 
-                <button 
-                    @click="submit" 
-                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
-                >
+                <button @click="submit" class="px-6 py-2 bg-blue-600 text-white rounded">
                     Save Items
                 </button>
             </div>
+
         </div>
     </AuthenticatedLayout>
 </template>
