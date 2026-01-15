@@ -153,9 +153,3 @@ http://127.0.0.1:8000
 
 This project was developed for **academic purposes only**.
 
-````
-
----
-
-
-
