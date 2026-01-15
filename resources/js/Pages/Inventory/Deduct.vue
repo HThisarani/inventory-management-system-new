@@ -1,11 +1,15 @@
 <script setup>
-import { ref } from 'vue'
-import { router, Head } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { router, Head, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 
 const props = defineProps({
     items: Array,
 })
+
+const page = usePage()
+const successMessage = computed(() => page.props.flash?.success || page.props.success)
+const errorMessage = computed(() => page.props.flash?.error || page.props.error)
 
 const rows = ref([
     { id: '', quantity: '' }
@@ -20,7 +24,13 @@ function removeRow(index) {
 }
 
 function submit() {
-    router.post('/inventory/deduct', { items: rows.value })
+    router.post('/inventory/deduct', { items: rows.value }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Reset form after successful submission
+            rows.value = [{ id: '', quantity: '' }]
+        }
+    })
 }
 </script>
 
@@ -35,6 +45,28 @@ function submit() {
         </template>
 
         <div class="p-4 md:p-6">
+            <!-- Success Message -->
+            <div 
+                v-if="successMessage" 
+                class="mb-6 bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 flex items-start gap-3"
+            >
+                <svg class="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <p class="font-medium">{{ successMessage }}</p>
+            </div>
+
+            <!-- Error Message -->
+            <div 
+                v-if="errorMessage" 
+                class="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 flex items-start gap-3"
+            >
+                <svg class="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <p class="font-medium">{{ errorMessage }}</p>
+            </div>
+
             <!-- Desktop Table View -->
             <div class="hidden md:block overflow-hidden rounded-lg border border-gray-200 shadow-sm mb-6">
                 <table class="w-full">
