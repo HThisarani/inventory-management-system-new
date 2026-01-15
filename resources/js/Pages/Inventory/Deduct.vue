@@ -29,62 +29,76 @@ function submit() {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
                 Deduct Inventory Items
             </h2>
         </template>
 
         <div class="p-6">
-            <table class="w-full border mb-4">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="border p-2">Item</th>
-                        <th class="border p-2">Quantity</th>
-                        <th class="border p-2">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(row, index) in rows" :key="index">
-                        <td class="border p-2">
-                            <select v-model="row.id" class="border p-1 w-full">
-                                <option value="">Select</option>
-                                <option
-                                    v-for="item in items"
-                                    :key="item.id"
-                                    :value="item.id"
+            <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm mb-6">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">Item</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">Quantity</th>
+                            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 border-b border-gray-200">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-for="(row, index) in rows" :key="index" class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-4">
+                                <select 
+                                    v-model="row.id" 
+                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
                                 >
-                                    {{ item.name }} ({{ item.quantity }})
-                                </option>
-                            </select>
-                        </td>
-                        <td class="border p-2">
-                            <input
-                                type="number"
-                                step="0.01"
-                                v-model="row.quantity"
-                                class="border p-1 w-full"
-                            />
-                        </td>
-                        <td class="border p-2 text-center">
-                            <button
-                                v-if="rows.length > 1"
-                                @click="removeRow(index)"
-                                class="text-red-600"
-                            >
-                                Remove
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                    <option value="">Select item</option>
+                                    <option
+                                        v-for="item in items"
+                                        :key="item.id"
+                                        :value="item.id"
+                                    >
+                                        {{ item.name }} ({{ item.quantity }})
+                                    </option>
+                                </select>
+                            </td>
+                            <td class="px-6 py-4">
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    v-model="row.quantity"
+                                    placeholder="0.00"
+                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                />
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <button
+                                    v-if="rows.length > 1"
+                                    @click="removeRow(index)"
+                                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm"
+                                >
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-            <button @click="addRow" class="bg-gray-200 px-4 py-2 mr-2">
-                + Add Row
-            </button>
+            <div class="flex items-center space-x-3">
+                <button 
+                    @click="addRow" 
+                    class="px-5 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all duration-200"
+                >
+                    + Add Row
+                </button>
 
-            <button @click="submit" class="bg-red-600 text-white px-4 py-2">
-                Deduct Items
-            </button>
+                <button 
+                    @click="submit" 
+                    class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                    Deduct Items
+                </button>
+            </div>
         </div>
     </AuthenticatedLayout>
 </template>
