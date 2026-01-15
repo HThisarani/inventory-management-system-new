@@ -9,7 +9,9 @@ use Inertia\Inertia;
 
 class InventoryController extends Controller
 {
-    // Show inventory list + search
+    /**
+     * Show inventory list with search
+     */
     public function index(Request $request)
     {
         $items = Item::query()
@@ -24,24 +26,34 @@ class InventoryController extends Controller
         ]);
     }
 
-    // Add items to inventory
+    /**
+     * Add items to inventory (one or many)
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'items' => 'required|array',
-            'items.*.name' => 'required|string',
-            'items.*.unit' => 'required|string',
+            'items.*.name' => 'required|string|max:255',
+            'items.*.unit' => 'required|string|max:50',
             'items.*.quantity' => 'required|numeric|min:0.01',
         ]);
 
         foreach ($validated['items'] as $data) {
+            // Create item if not exists
             $item = Item::firstOrCreate(
-                ['name' => $data['name'], 'unit' => $data['unit']],
-                ['quantity' => 0]
+                [
+                    'name' => $data['name'],
+                    'unit' => $data['unit'],
+                ],
+                [
+                    'quantity' => 0,
+                ]
             );
 
+            // Increase quantity
             $item->increment('quantity', $data['quantity']);
 
+            // Record transaction
             InventoryTransaction::create([
                 'item_id' => $item->id,
                 'type' => 'add',
@@ -49,10 +61,13 @@ class InventoryController extends Controller
             ]);
         }
 
-        return redirect()->back();
+        return redirect()->back()
+            ->with('success', 'Inventory items added successfully.');
     }
 
-    // Deduct items from inventory
+    /**
+     * Deduct items from inventory (one or many)
+     */
     public function deduct(Request $request)
     {
         $validated = $request->validate([
@@ -64,12 +79,16 @@ class InventoryController extends Controller
         foreach ($validated['items'] as $data) {
             $item = Item::findOrFail($data['id']);
 
+            // Prevent over-deduction
             if ($item->quantity < $data['quantity']) {
-                abort(400, 'Insufficient stock');
+                return redirect()->back()
+                    ->with('error', 'Insufficient stock for item: ' . $item->name);
             }
 
+            // Deduct quantity
             $item->decrement('quantity', $data['quantity']);
 
+            // Record transaction
             InventoryTransaction::create([
                 'item_id' => $item->id,
                 'type' => 'deduct',
@@ -77,15 +96,20 @@ class InventoryController extends Controller
             ]);
         }
 
-        return redirect()->back();
+        return redirect()->back()
+            ->with('success', 'Inventory deducted successfully.');
     }
 
-    // View item history
+    /**
+     * View transaction history of an item
+     */
     public function history(Item $item)
     {
         return Inertia::render('Inventory/History', [
             'item' => $item,
-            'transactions' => $item->transactions()->latest()->get(),
+            'transactions' => $item->transactions()
+                ->latest()
+                ->get(),
         ]);
     }
 }
