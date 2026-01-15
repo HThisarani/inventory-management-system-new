@@ -2,7 +2,7 @@
 # Inventory Management System
 
 A web-based Inventory Management System developed using **Laravel**, **Inertia.js**, and **Vue 3**.  
-The system allows authenticated users to manage inventory items, including adding stock, deducting stock, and viewing transaction history through a user-friendly interface.
+The system allows an authenticated user to manage inventory items by adding stock, deducting stock, and viewing transaction history through a clean and user-friendly interface.
 
 ---
 
@@ -10,13 +10,25 @@ The system allows authenticated users to manage inventory items, including addin
 
 - User authentication (Login & Logout)
 - Dashboard with summary overview
-- Add inventory items (multiple items at once)
-- Deduct inventory quantities
-- View inventory list
-- Transaction history tracking
-- Search inventory items
+- Add inventory items (one or multiple items at once)
+- Support for multiple measurement units (Kg, g, cm, m, L, ml, Units)
+- Deduct inventory quantities (single or multiple items)
+- Inventory transaction history (additions & deductions)
+- Search inventory items by name
 - Responsive UI with navigation bar
 - Secure access using authentication middleware
+
+---
+
+## 📌 Functional Requirements Coverage
+
+| Requirement | Status |
+|------------|--------|
+| Authenticated user adds items | ✅ Implemented |
+| Multiple measurement units | ✅ Implemented |
+| Deduct inventory items | ✅ Implemented |
+| Track inventory history | ✅ Implemented |
+| Search inventory items | ✅ Implemented |
 
 ---
 
@@ -28,6 +40,25 @@ The system allows authenticated users to manage inventory items, including addin
 - **Database:** MySQL  
 - **Authentication:** Laravel Breeze  
 - **Build Tool:** Vite  
+
+---
+
+## 🎨 UI/UX Design Decisions
+
+- A dashboard provides a quick overview of inventory activities
+- Add and Deduct pages support multiple items per operation to reduce repetitive work
+- Search functionality improves item discoverability
+- Responsive layouts ensure usability on desktop and mobile devices
+- Clear success and error messages guide user actions
+
+---
+
+## 🔐 Security Considerations
+
+- All inventory-related routes are protected using Laravel authentication middleware
+- CSRF protection is enabled by default
+- Server-side validation is applied for all inventory operations
+- Unauthorized users cannot access inventory pages
 
 ---
 
@@ -120,19 +151,20 @@ http://127.0.0.1:8000
 
 ## 📄 License
 
-This project was developed for **academic purposes**.
+This project was developed for **academic purposes only**.
 
 ````
 
 ---
 
-### ✅ FINAL STEP (ONLY ONCE)
+## ✅ FINAL GIT COMMANDS (RUN ONCE)
 
 ```bash
 git add README.md
-git commit -m "Add project README"
+git commit -m "Update README with features, security, and UI details"
 git push origin main
 ````
 
 ---
+
 
