@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { router, Head, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 
@@ -15,6 +15,7 @@ const items = ref([
 
 const showSuccess = ref(false)
 const errors = ref([])
+const successMessage = computed(() => page.props.flash?.success || page.props.success)
 
 function addRow() {
     items.value.push({ name: '', unit: '', quantity: '' })
@@ -64,6 +65,7 @@ function submit() {
     if (!validateForm()) return
 
     router.post('/inventory/add', { items: items.value }, {
+        preserveScroll: true,
         onSuccess: () => {
             showSuccess.value = true
             items.value = [{ name: '', unit: '', quantity: '' }]
@@ -77,7 +79,7 @@ function submit() {
 <template>
     <Head title="Add Items" />
 
-    <!-- 🔹 ITEM NAME SUGGESTIONS -->
+    <!-- ITEM NAME SUGGESTIONS -->
     <datalist id="item-names">
         <option
             v-for="item in existingItems"
@@ -88,71 +90,82 @@ function submit() {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl md:text-2xl text-gray-800">
+            <h2 class="font-semibold text-xl md:text-2xl text-gray-800 leading-tight">
                 Add Inventory Items
             </h2>
         </template>
 
         <div class="p-4 md:p-6">
-
             <!-- SUCCESS MESSAGE -->
             <div
-                v-if="showSuccess || page.props.flash?.success"
-                class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg"
+                v-if="showSuccess || successMessage"
+                class="mb-6 bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 flex items-start gap-3"
             >
-                Items added successfully
+                <svg class="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <p class="font-medium">{{ successMessage || 'Items added successfully' }}</p>
             </div>
 
-            <!-- DESKTOP TABLE -->
-            <div class="hidden md:block border rounded-lg shadow mb-6">
+            <!-- DESKTOP TABLE VIEW -->
+            <div class="hidden md:block overflow-hidden rounded-lg border border-gray-200 shadow-sm mb-6">
                 <table class="w-full">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="p-3 text-left">Name</th>
-                            <th class="p-3 text-left">Unit</th>
-                            <th class="p-3 text-left">Quantity</th>
-                            <th class="p-3 text-center">Action</th>
+                    <thead>
+                        <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">Item Name</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">Unit</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 border-b border-gray-200">Quantity</th>
+                            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 border-b border-gray-200">Action</th>
                         </tr>
                     </thead>
-
-                    <tbody>
-                        <tr v-for="(item, index) in items" :key="index">
-                            <td class="p-3">
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-for="(item, index) in items" :key="index" class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-4">
                                 <input
                                     v-model="item.name"
                                     list="item-names"
                                     placeholder="Enter item name"
-                                    class="w-full border rounded px-3 py-2"
+                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    :class="{ 'border-red-500': getError(index, 'name') }"
                                 />
-                                <p class="text-red-500 text-xs">{{ getError(index,'name') }}</p>
+                                <p v-if="getError(index, 'name')" class="text-red-600 text-xs mt-1">
+                                    {{ getError(index, 'name') }}
+                                </p>
                             </td>
-
-                            <td class="p-3">
-                                <select v-model="item.unit" class="w-full border rounded px-3 py-2">
-                                    <option value="">Select</option>
+                            <td class="px-6 py-4">
+                                <select 
+                                    v-model="item.unit" 
+                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                                    :class="{ 'border-red-500': getError(index, 'unit') }"
+                                >
+                                    <option value="">Select unit</option>
                                     <option>Kg</option>
                                     <option>m</option>
                                     <option>cm</option>
                                     <option>Units</option>
                                 </select>
-                                <p class="text-red-500 text-xs">{{ getError(index,'unit') }}</p>
+                                <p v-if="getError(index, 'unit')" class="text-red-600 text-xs mt-1">
+                                    {{ getError(index, 'unit') }}
+                                </p>
                             </td>
-
-                            <td class="p-3">
+                            <td class="px-6 py-4">
                                 <input
                                     type="number"
                                     step="0.01"
                                     v-model="item.quantity"
-                                    class="w-full border rounded px-3 py-2"
+                                    placeholder="0.00"
+                                    class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    :class="{ 'border-red-500': getError(index, 'quantity') }"
                                 />
-                                <p class="text-red-500 text-xs">{{ getError(index,'quantity') }}</p>
+                                <p v-if="getError(index, 'quantity')" class="text-red-600 text-xs mt-1">
+                                    {{ getError(index, 'quantity') }}
+                                </p>
                             </td>
-
-                            <td class="p-3 text-center">
+                            <td class="px-6 py-4 text-center">
                                 <button
                                     v-if="items.length > 1"
                                     @click="removeRow(index)"
-                                    class="text-red-600"
+                                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm"
                                 >
                                     Remove
                                 </button>
@@ -162,17 +175,91 @@ function submit() {
                 </table>
             </div>
 
+            <!-- MOBILE CARD VIEW -->
+            <div class="md:hidden space-y-4 mb-6">
+                <div 
+                    v-for="(item, index) in items" 
+                    :key="index" 
+                    class="bg-white rounded-lg border border-gray-200 shadow-sm p-4"
+                >
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-sm font-semibold text-gray-700">Item #{{ index + 1 }}</span>
+                        <button
+                            v-if="items.length > 1"
+                            @click="removeRow(index)"
+                            class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-all duration-200"
+                        >
+                            Remove
+                        </button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Item Name</label>
+                            <input
+                                v-model="item.name"
+                                list="item-names"
+                                placeholder="Enter item name"
+                                class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+                                :class="{ 'border-red-500': getError(index, 'name') }"
+                            />
+                            <p v-if="getError(index, 'name')" class="text-red-600 text-xs mt-1">
+                                {{ getError(index, 'name') }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Unit</label>
+                            <select 
+                                v-model="item.unit" 
+                                class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-sm"
+                                :class="{ 'border-red-500': getError(index, 'unit') }"
+                            >
+                                <option value="">Select unit</option>
+                                <option>Kg</option>
+                                <option>m</option>
+                                <option>cm</option>
+                                <option>Units</option>
+                            </select>
+                            <p v-if="getError(index, 'unit')" class="text-red-600 text-xs mt-1">
+                                {{ getError(index, 'unit') }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                v-model="item.quantity"
+                                placeholder="0.00"
+                                class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+                                :class="{ 'border-red-500': getError(index, 'quantity') }"
+                            />
+                            <p v-if="getError(index, 'quantity')" class="text-red-600 text-xs mt-1">
+                                {{ getError(index, 'quantity') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- ACTION BUTTONS -->
-            <div class="flex gap-3">
-                <button @click="addRow" class="px-4 py-2 bg-gray-200 rounded">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <button 
+                    @click="addRow" 
+                    class="px-5 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all duration-200 text-sm sm:text-base"
+                >
                     + Add Row
                 </button>
 
-                <button @click="submit" class="px-6 py-2 bg-blue-600 text-white rounded">
+                <button 
+                    @click="submit" 
+                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+                >
                     Save Items
                 </button>
             </div>
-
         </div>
     </AuthenticatedLayout>
 </template>
